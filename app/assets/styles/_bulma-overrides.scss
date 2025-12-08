@@ -6,4 +6,4 @@
 );
 
 // Importar todo Bulma (estructura, componentes, etc.)
-@forward "bulma/sass";
+@use "bulma/sass";
