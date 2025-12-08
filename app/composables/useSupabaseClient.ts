@@ -7,3 +7,4 @@ export const useSupabaseClient = () => {
   }
   return $supabase as SupabaseClient
 }
+

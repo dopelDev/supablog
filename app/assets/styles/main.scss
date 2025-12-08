@@ -1,0 +1,23 @@
+// Variables de Bulma antes de importarlo
+// Estos valores corresponden a los colores definidos en _colors.scss
+$primary: #bfa980 !default;
+$link: #6c5d53 !default;
+$link-hover: #3e342f !default;
+$family-primary: "Gabriela", serif !default;
+
+// Importar Bulma con las variables configuradas
+@use "bulma/bulma";
+
+// Reset de estilos antes de los estilos custom
+@use "@styles/reset";
+
+// Importar colores custom (usando alias @styles)
+@use "@styles/colors" as *;
+
+// Importar fuentes (usando alias @styles)
+@use "@styles/fonts" as *;
+
+// Importar estilos base (usando alias @styles)
+@use "@styles/globals";
+
+// Los componentes ahora tienen sus propios SCSS en sus carpetas dentro de components/

@@ -1,0 +1,17 @@
+// ============================================
+// VARIABLES DE FUENTES
+// ============================================
+
+// Fuentes de Google Fonts
+$font-ms-madi: "Ms Madi", cursive;
+$font-fascinate-inline: "Fascinate Inline", cursive;
+$font-gabriela: "Gabriela", serif;
+$font-just-another-hand: "Just Another Hand", cursive;
+
+// Fuente base principal (para el periódico)
+$font-family-base: $font-gabriela;
+
+// Fuentes secundarias (opcionales)
+$font-family-accent: $font-fascinate-inline;
+$font-family-handwriting: $font-just-another-hand;
+$font-family-decorative: $font-ms-madi;
