@@ -1,0 +1,9 @@
+@use "@styles/fonts" as fonts;
+
+// Configurar Bulma solo con tipografía (sin colores)
+@use "bulma/sass/utilities" with (
+  $family-primary: fonts.$font-gabriela
+);
+
+// Importar todo Bulma (estructura, componentes, etc.)
+@forward "bulma/sass";

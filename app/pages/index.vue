@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DecorativeHeaderLine />
+    <ClassifiedRibbon class="my-6" />
   </div>
 </template>
 

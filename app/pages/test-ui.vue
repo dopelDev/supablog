@@ -25,6 +25,85 @@
         </div>
       </div>
 
+      <!-- Sección de Componentes UI -->
+      <div class="mb-6">
+        <h2 class="title is-3 mb-4">UI Components</h2>
+        
+        <!-- ClassifiedRibbon -->
+        <div class="mb-6">
+          <h3 class="title is-4 mb-4">ClassifiedRibbon</h3>
+          <div class="columns is-multiline">
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Default Ribbon:</p>
+                <ClassifiedRibbon />
+              </div>
+            </div>
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Custom Text:</p>
+                <ClassifiedRibbon label="NEWS & UPDATES" />
+              </div>
+            </div>
+            <div class="column is-half">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Without Shadow:</p>
+                <ClassifiedRibbon :shadow="false" />
+              </div>
+            </div>
+            <div class="column is-half">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Smaller Size:</p>
+                <ClassifiedRibbon :width="240" :height="70" label="SMALL" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DecorativeArrow -->
+        <div class="mb-6">
+          <h3 class="title is-4 mb-4">DecorativeArrow</h3>
+          <div class="columns is-multiline">
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Default (Both directions):</p>
+                <DecorativeArrow />
+              </div>
+            </div>
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Left arrow only:</p>
+                <DecorativeArrow direction="left" />
+              </div>
+            </div>
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Right arrow only:</p>
+                <DecorativeArrow direction="right" />
+              </div>
+            </div>
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Thicker line (4px):</p>
+                <DecorativeArrow :thickness="4" />
+              </div>
+            </div>
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Custom color:</p>
+                <DecorativeArrow color="hsl(39, 30%, 62%)" />
+              </div>
+            </div>
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Fixed width (400px):</p>
+                <DecorativeArrow length="400px" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Sección de Fuentes -->
       <div class="mb-6">
         <h2 class="title is-3 mb-4">Google Fonts</h2>

@@ -1,34 +1,73 @@
+// Permite usar el módulo solo como proveedor de tokens (sin emitir CSS)
+$emit-global-styles: true !default;
+
+@forward "@styles/colors";
 @use "@styles/colors";
 
-body {
-  min-height: 100vh;
-  transition: background-color 200ms ease, color 200ms ease;
+@if $emit-global-styles {
+  :root {
+    --color-background: #{colors.$lm-background};
+    --color-surface: #{colors.$lm-surface};
+    --color-surface-2: #{colors.$lm-surface-2};
+    --color-text-primary: #{colors.$lm-text-primary};
+    --color-text-secondary: #{colors.$lm-text-secondary};
+    --color-text-muted: #{colors.$lm-text-muted};
+    --color-border: #{colors.$lm-border};
+    --color-divider: #{colors.$lm-divider};
+    --color-accent-1: #{colors.$lm-accent-1};
+    --color-accent-2: #{colors.$lm-accent-2};
+    --color-accent-3: #{colors.$lm-accent-3};
+    --color-accent-4: #{colors.$lm-accent-4};
+    --color-link: #{colors.$lm-link};
+    --color-link-hover: #{colors.$lm-link-hover};
+    --color-shadow: #{colors.$lm-shadow};
+    --color-shadow-strong: #{colors.$lm-shadow-strong};
+  }
 
-  background:
-    radial-gradient(circle at 18% 18%, colors.$lm-surface-2, colors.$lm-background),
-    radial-gradient(circle at 82% 12%, colors.$lm-accent-4, colors.$lm-surface);
-  color: colors.$lm-text-primary;
+  body.dark {
+    --color-background: #{colors.$dm-background};
+    --color-surface: #{colors.$dm-surface};
+    --color-surface-2: #{colors.$dm-surface-2};
+    --color-text-primary: #{colors.$dm-text-primary};
+    --color-text-secondary: #{colors.$dm-text-secondary};
+    --color-text-muted: #{colors.$dm-text-muted};
+    --color-border: #{colors.$dm-border};
+    --color-divider: #{colors.$dm-divider};
+    --color-accent-1: #{colors.$dm-accent-1};
+    --color-accent-2: #{colors.$dm-accent-2};
+    --color-accent-3: #{colors.$dm-accent-3};
+    --color-accent-4: #{colors.$dm-accent-4};
+    --color-link: #{colors.$dm-link};
+    --color-link-hover: #{colors.$dm-link-hover};
+    --color-shadow: #{colors.$dm-shadow};
+    --color-shadow-strong: #{colors.$dm-shadow-strong};
+  }
 
-  &.dark {
+  body {
+    min-height: 100vh;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+
     background:
-      radial-gradient(circle at 18% 18%, colors.$dm-surface-2, colors.$dm-background),
-      radial-gradient(circle at 82% 12%, colors.$dm-accent-4, colors.$dm-surface);
-    color: colors.$dm-text-primary;
+      radial-gradient(
+        circle at 18% 18%,
+        var(--color-surface-2),
+        var(--color-background)
+      ),
+      radial-gradient(
+        circle at 82% 12%,
+        var(--color-accent-4),
+        var(--color-surface)
+      );
+    color: var(--color-text-primary);
   }
-}
 
-a {
-  color: colors.$lm-link;
-
-  &:hover {
-    color: colors.$lm-link-hover;
-  }
-
-  body.dark & {
-    color: colors.$dm-link;
+  a {
+    color: var(--color-link);
 
     &:hover {
-      color: colors.$dm-link-hover;
+      color: var(--color-link-hover);
     }
   }
 }

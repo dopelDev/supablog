@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { scssAliasPlugin } from './vite-scss-alias'
 
 const stylesPath = fileURLToPath(new URL('./app/assets/styles', import.meta.url))
-const componentsPath = fileURLToPath(new URL('./app/components', import.meta.url))
+const uiPath = fileURLToPath(new URL('./app/ui', import.meta.url))
 const layoutsPath = fileURLToPath(new URL('./app/layouts', import.meta.url))
 const composablesPath = fileURLToPath(new URL('./app/composables', import.meta.url))
 const pagesPath = fileURLToPath(new URL('./app/pages', import.meta.url))
@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   // Configurar directorios personalizados usando las rutas resueltas
   components: [
     {
-      path: componentsPath,
+      path: uiPath,
       pathPrefix: false
     }
   ],
@@ -36,7 +36,7 @@ export default defineNuxtConfig({
       link: [
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Ms+Madi&family=Fascinate+Inline&family=Gabriela&family=Just+Another+Hand&display=swap'
+          href: 'https://fonts.googleapis.com/css2?family=Ms+Madi&family=Fascinate+Inline&family=Gabriela&family=Just+Another+Hand&family=Playfair+Display:wght@400;700&family=Libre+Baskerville:wght@400;700&family=UnifrakturMaguntia&display=swap'
         }
       ]
     }
@@ -53,7 +53,7 @@ export default defineNuxtConfig({
       preprocessorOptions: {
         scss: {
           // @ts-ignore - includePaths is valid for Sass
-          includePaths: [stylesPath, componentsPath],
+          includePaths: [stylesPath],
           additionalData: ''
         }
       }
@@ -61,7 +61,7 @@ export default defineNuxtConfig({
     resolve: {
       alias: {
         '@styles': stylesPath,
-        '@components': componentsPath,
+        '@ui': uiPath,
         '@layouts': layoutsPath,
         '@composables': composablesPath,
         '@pages': pagesPath,

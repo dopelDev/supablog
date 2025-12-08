@@ -1,23 +1,15 @@
-// Variables de Bulma antes de importarlo
-// Estos valores corresponden a los colores definidos en _colors.scss
-$primary: #bfa980 !default;
-$link: #6c5d53 !default;
-$link-hover: #3e342f !default;
-$family-primary: "Gabriela", serif !default;
-
-// Importar Bulma con las variables configuradas
-@use "bulma/bulma";
+@use "sass:meta";
 
 // Reset de estilos antes de los estilos custom
 @use "@styles/reset";
 
-// Importar colores custom (usando alias @styles)
-@use "@styles/colors" as *;
+// Bulma con variables configuradas desde nuestros tokens
+@use "@styles/bulma-overrides";
 
-// Importar fuentes (usando alias @styles)
-@use "@styles/fonts" as *;
+// Importar mixins (usando alias @styles) - debe estar antes de @include
+@use "@styles/mixins" as *;
 
-// Importar estilos base (usando alias @styles)
-@use "@styles/globals";
+// Emitir estilos base (CSS vars, body, links) después de Bulma
+@include meta.load-css("@styles/globals");
 
 // Los componentes ahora tienen sus propios SCSS en sus carpetas dentro de components/

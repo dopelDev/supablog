@@ -1,27 +1,33 @@
 // ============================================
 // COLORES MODO CLARO (Light Mode)
 // ============================================
-$lm-background: hsl(45, 34%, 93%);      // #F4F1E9
-$lm-surface: hsl(45, 26%, 91%);         // #EFECE4
-$lm-surface-2: hsl(45, 20%, 86%);       // #E7E3D8
+/* Fondo */
+$lm-background: hsl(45, 34%, 93%); // #F4F1E9 fondo cálido claro
+$lm-surface: hsl(45, 26%, 91%); // #EFECE4 superficie principal
+$lm-surface-2: hsl(45, 20%, 86%); // #E7E3D8 superficie elevada suave
 
-$lm-text-primary: hsl(0, 0%, 10%);      // #1A1A1A
-$lm-text-secondary: hsl(0, 0%, 23%);    // #3A3A3A
-$lm-text-muted: hsl(30, 6%, 41%);       // #6F6A63
+/* Texto */
+$lm-text-primary: hsl(0, 0%, 10%); // #1A1A1A texto principal
+$lm-text-secondary: hsl(0, 0%, 23%); // #3A3A3A texto secundario
+$lm-text-muted: hsl(30, 6%, 41%); // #6F6A63 texto tenue
 
-$lm-border: hsl(42, 11%, 75%);          // #C8C3B8
-$lm-divider: hsl(42, 16%, 82%);         // #D7D2C8
+/* Dividers & Borders */
+$lm-border: hsl(42, 11%, 75%); // #C8C3B8 borde suave
+$lm-divider: hsl(42, 16%, 82%); // #D7D2C8 divisor claro
 
-$lm-accent-1: hsl(39, 30%, 62%);        // #BFA980
-$lm-accent-2: hsl(33, 23%, 54%);        // #A68D6C
-$lm-accent-3: hsl(28, 20%, 45%);        // #8A735B
-$lm-accent-4: hsl(39, 22%, 69%);        // #C3B49C
+/* Accent Colors */
+$lm-accent-1: hsl(39, 30%, 62%); // #BFA980 acento primario
+$lm-accent-2: hsl(33, 23%, 54%); // #A68D6C acento secundario
+$lm-accent-3: hsl(28, 20%, 45%); // #8A735B acento terciario
+$lm-accent-4: hsl(39, 22%, 69%); // #C3B49C acento cuaternario
 
-$lm-shadow: hsl(48, 3%, 66%);           // #ABAAA4
-$lm-shadow-strong: hsl(40, 4%, 55%);    // #8F8B82
+/* Depth */
+$lm-shadow: hsl(48, 3%, 66%); // #ABAAA4 sombra suave
+$lm-shadow-strong: hsl(40, 4%, 55%); // #8F8B82 sombra fuerte
 
-$lm-link: hsl(24, 9%, 38%);             // #6C5D53
-$lm-link-hover: hsl(22, 7%, 21%);       // #3E342F
+/* Interactivos */
+$lm-link: hsl(24, 9%, 38%); // #6C5D53 enlace
+$lm-link-hover: hsl(22, 7%, 21%); // #3E342F enlace hover
 
 /* ======================================================
    DARK MODE (Tabloid Británico + Legible) — HSL
@@ -29,50 +35,37 @@ $lm-link-hover: hsl(22, 7%, 21%);       // #3E342F
    ====================================================== */
 
 /* Fondo */
-$dm-background: hsl(220, 10%, 8%);       // gris carbón oscuro
-$dm-surface:    hsl(220, 8%, 14%);       // superficie legible
-$dm-surface-2:  hsl(220, 7%, 20%);       // elevación suave
+$dm-background: hsl(220, 10%, 8%); // #121416 gris carbón oscuro
+$dm-surface: hsl(220, 8%, 14%); // #212327 superficie legible
+$dm-surface-2: hsl(220, 7%, 20%); // #2F3237 elevación suave
 
 /* Texto */
-$dm-text-primary:   hsl(0, 0%, 96%);     // blanco editorial
-$dm-text-secondary: hsl(0, 0%, 78%);
-$dm-text-muted:     hsl(220, 10%, 65%);
+$dm-text-primary: hsl(0, 0%, 96%); // #F5F5F5 blanco editorial
+$dm-text-secondary: hsl(0, 0%, 78%); // #C7C7C7
+$dm-text-muted: hsl(220, 10%, 65%); // #9DA3AF
 
 /* Dividers & Borders */
-$dm-border:  hsl(220, 10%, 30%);
-$dm-divider: hsl(220, 10%, 24%);
+$dm-border: hsl(220, 10%, 30%); // #454A54
+$dm-divider: hsl(220, 10%, 24%); // #373B43
 
 /* DARK MODE — SOLO 4 ACCENTS (versión final) */
 
 /* Accent 1 — Primario (fuerte, editorial, énfasis) */
-$dm-accent-1: hsl(356, 92%, 54%);   // #EF4444
+$dm-accent-1: hsl(356, 92%, 54%); // #EF4444
 
 /* Accent 2 — Secundario (más cálido, intenso) */
-$dm-accent-2: hsl(19, 92%, 56%);    // #F97316
+$dm-accent-2: hsl(19, 92%, 56%); // #F97316
 
 /* Accent 3 — Terciario (bronce editorial) */
-$dm-accent-3: hsl(28, 64%, 54%);    // #D97706
+$dm-accent-3: hsl(28, 64%, 54%); // #D97706
 
 /* Accent 4 — Cuaternario (latón/pergamino cálido, como light mode pero adaptado a dark) */
-$dm-accent-4: hsl(36, 52%, 58%);    // #F59E0B   
+$dm-accent-4: hsl(36, 52%, 58%); // #F59E0B
 
 /* Interactivos */
-$dm-link:       hsl(356, 80%, 62%);      // link tabloide
-$dm-link-hover: hsl(48, 100%, 60%);      // hover estilo alerta
+$dm-link: hsl(356, 80%, 62%); // #EC515B link tabloide
+$dm-link-hover: hsl(48, 100%, 60%); // #FFD633 hover estilo alerta
 
 /* Depth */
-$dm-shadow:        hsl(220, 10%, 5%);
-$dm-shadow-strong: hsl(220, 10%, 3%);
-
-// ============================================
-// COLORES PRIMARIOS (para Bulma)
-// ============================================
-$color-primary: $lm-accent-1;           // #BFA980
-$color-link: $lm-link;                  // #6C5D53
-$color-link-hover: $lm-link-hover;      // #3E342F
-
-// ============================================
-// OTRAS VARIABLES
-// ============================================
-$panel-radius: 18px;
-
+$dm-shadow: hsl(220, 10%, 5%); // #0B0C0E
+$dm-shadow-strong: hsl(220, 10%, 3%); // #070708
