@@ -13,12 +13,14 @@
           >
             <div class="color-card box">
               <div
-                class="color-swatch"
-                :style="{ backgroundColor: color.value }"
+                :class="`color-swatch color-swatch--${color.cssVar}`"
+                :data-css-var="color.cssVar"
               ></div>
               <div class="color-info mt-3">
                 <p class="has-text-weight-bold mb-1">{{ color.name }}</p>
-                <p class="is-size-7 has-text-grey">{{ color.value }}</p>
+                <p class="is-size-7 has-text-grey color-value" :data-css-var="color.cssVar">
+                  {{ getColorValue(color.cssVar) }}
+                </p>
               </div>
             </div>
           </div>
@@ -29,75 +31,111 @@
       <div class="mb-6">
         <h2 class="title is-3 mb-4">UI Components</h2>
         
-        <!-- ClassifiedRibbon -->
+        <!-- ClassifiedsRibbon -->
         <div class="mb-6">
-          <h3 class="title is-4 mb-4">ClassifiedRibbon</h3>
+          <h3 class="title is-4 mb-4">ClassifiedsRibbon</h3>
           <div class="columns is-multiline">
             <div class="column is-full">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Default Ribbon:</p>
-                <ClassifiedRibbon />
+                <p class="mb-4 has-text-weight-bold">Default Ribbon (slot vacío muestra "CLASSIFIEDS"):</p>
+                <ClassifiedsRibbon />
               </div>
             </div>
             <div class="column is-full">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Custom Text:</p>
-                <ClassifiedRibbon label="NEWS & UPDATES" />
+                <p class="mb-4 has-text-weight-bold">Custom Text usando slot:</p>
+                <ClassifiedsRibbon>NEWS & UPDATES</ClassifiedsRibbon>
               </div>
             </div>
             <div class="column is-half">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Without Shadow:</p>
-                <ClassifiedRibbon :shadow="false" />
+                <p class="mb-4 has-text-weight-bold">Otro ejemplo de texto personalizado:</p>
+                <ClassifiedsRibbon>ANNOUNCEMENTS</ClassifiedsRibbon>
               </div>
             </div>
             <div class="column is-half">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Smaller Size:</p>
-                <ClassifiedRibbon :width="240" :height="70" label="SMALL" />
+                <p class="mb-4 has-text-weight-bold">Más variaciones:</p>
+                <ClassifiedsRibbon>SPECIAL OFFERS</ClassifiedsRibbon>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- DecorativeArrow -->
+        <!-- ArrowDivider -->
         <div class="mb-6">
-          <h3 class="title is-4 mb-4">DecorativeArrow</h3>
+          <h3 class="title is-4 mb-4">ArrowDivider</h3>
           <div class="columns is-multiline">
             <div class="column is-full">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Default (Both directions):</p>
-                <DecorativeArrow />
+                <p class="mb-4 has-text-weight-bold">Default Divider (flechas en ambos extremos):</p>
+                <ArrowDivider />
               </div>
             </div>
             <div class="column is-full">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Left arrow only:</p>
-                <DecorativeArrow direction="left" />
+                <p class="mb-4 has-text-weight-bold">Entre secciones de contenido:</p>
+                <p class="mb-4">Contenido superior</p>
+                <ArrowDivider />
+                <p class="mt-4">Contenido inferior</p>
               </div>
             </div>
             <div class="column is-full">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Right arrow only:</p>
-                <DecorativeArrow direction="right" />
+                <p class="mb-4 has-text-weight-bold">Múltiples dividers:</p>
+                <ArrowDivider />
+                <ArrowDivider />
+                <ArrowDivider />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ClassifiedsBox -->
+        <div class="mb-6">
+          <h3 class="title is-4 mb-4">ClassifiedsBox</h3>
+          <div class="columns is-multiline">
+            <div class="column is-full">
+              <div class="box">
+                <p class="mb-4 has-text-weight-bold">Default Box (título "Classifieds"):</p>
+                <ClassifiedsBox>
+                  <p>Contenido del box de clasificados. Aquí puedes poner cualquier contenido.</p>
+                </ClassifiedsBox>
               </div>
             </div>
             <div class="column is-full">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Thicker line (4px):</p>
-                <DecorativeArrow :thickness="4" />
+                <p class="mb-4 has-text-weight-bold">Con título personalizado usando slot "title":</p>
+                <ClassifiedsBox>
+                  <template #title>NEWS & UPDATES</template>
+                  <p>Este box tiene un título personalizado en el ribbon.</p>
+                  <p class="mt-2">Puedes agregar múltiples párrafos y contenido aquí.</p>
+                </ClassifiedsBox>
               </div>
             </div>
-            <div class="column is-full">
+            <div class="column is-half">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Custom color:</p>
-                <DecorativeArrow color="hsl(39, 30%, 62%)" />
+                <p class="mb-4 has-text-weight-bold">Box con contenido variado:</p>
+                <ClassifiedsBox>
+                  <template #title>ANNOUNCEMENTS</template>
+                  <ul>
+                    <li>Primer anuncio importante</li>
+                    <li>Segundo anuncio</li>
+                    <li>Tercer anuncio</li>
+                  </ul>
+                </ClassifiedsBox>
               </div>
             </div>
-            <div class="column is-full">
+            <div class="column is-half">
               <div class="box">
-                <p class="mb-4 has-text-weight-bold">Fixed width (400px):</p>
-                <DecorativeArrow length="400px" />
+                <p class="mb-4 has-text-weight-bold">Box con enlaces:</p>
+                <ClassifiedsBox>
+                  <template #title>LINKS</template>
+                  <p>
+                    <a href="#">Enlace de ejemplo 1</a> | 
+                    <a href="#">Enlace de ejemplo 2</a>
+                  </p>
+                </ClassifiedsBox>
               </div>
             </div>
           </div>
@@ -130,84 +168,88 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const { isDarkMode } = useDarkMode()
 
-const lightColors = {
+// Estructura simple con nombres de colores y sus CSS variables correspondientes
+const colorDefinitions = {
   backgrounds: [
-    { name: 'lm-background', value: 'hsl(45, 34%, 93%)' },
-    { name: 'lm-surface', value: 'hsl(45, 26%, 91%)' },
-    { name: 'lm-surface-2', value: 'hsl(45, 20%, 86%)' },
+    { name: 'background', cssVar: 'background' },
+    { name: 'surface', cssVar: 'surface' },
+    { name: 'surface-2', cssVar: 'surface-2' },
   ],
   text: [
-    { name: 'lm-text-primary', value: 'hsl(0, 0%, 10%)' },
-    { name: 'lm-text-secondary', value: 'hsl(0, 0%, 23%)' },
-    { name: 'lm-text-muted', value: 'hsl(30, 6%, 41%)' },
+    { name: 'text-primary', cssVar: 'text-primary' },
+    { name: 'text-secondary', cssVar: 'text-secondary' },
+    { name: 'text-muted', cssVar: 'text-muted' },
   ],
   accents: [
-    { name: 'lm-accent-1', value: 'hsl(39, 30%, 62%)' },
-    { name: 'lm-accent-2', value: 'hsl(33, 23%, 54%)' },
-    { name: 'lm-accent-3', value: 'hsl(28, 20%, 45%)' },
-    { name: 'lm-accent-4', value: 'hsl(39, 22%, 69%)' },
+    { name: 'accent-1', cssVar: 'accent-1' },
+    { name: 'accent-2', cssVar: 'accent-2' },
+    { name: 'accent-3', cssVar: 'accent-3' },
+    { name: 'accent-4', cssVar: 'accent-4' },
   ],
   borders: [
-    { name: 'lm-border', value: 'hsl(42, 11%, 75%)' },
-    { name: 'lm-divider', value: 'hsl(42, 16%, 82%)' },
+    { name: 'border', cssVar: 'border' },
+    { name: 'divider', cssVar: 'divider' },
   ],
   shadows: [
-    { name: 'lm-shadow', value: 'hsl(48, 3%, 66%)' },
-    { name: 'lm-shadow-strong', value: 'hsl(40, 4%, 55%)' },
+    { name: 'shadow', cssVar: 'shadow' },
+    { name: 'shadow-strong', cssVar: 'shadow-strong' },
   ],
   links: [
-    { name: 'lm-link', value: 'hsl(24, 9%, 38%)' },
-    { name: 'lm-link-hover', value: 'hsl(22, 7%, 21%)' },
+    { name: 'link', cssVar: 'link' },
+    { name: 'link-hover', cssVar: 'link-hover' },
   ],
 }
 
-const darkColors = {
-  backgrounds: [
-    { name: 'dm-background', value: 'hsl(220, 10%, 8%)' },
-    { name: 'dm-surface', value: 'hsl(220, 8%, 14%)' },
-    { name: 'dm-surface-2', value: 'hsl(220, 7%, 20%)' },
-  ],
-  text: [
-    { name: 'dm-text-primary', value: 'hsl(0, 0%, 96%)' },
-    { name: 'dm-text-secondary', value: 'hsl(0, 0%, 78%)' },
-    { name: 'dm-text-muted', value: 'hsl(220, 10%, 65%)' },
-  ],
-  accents: [
-    { name: 'dm-accent-1', value: 'hsl(356, 92%, 54%)' },
-    { name: 'dm-accent-2', value: 'hsl(19, 92%, 56%)' },
-    { name: 'dm-accent-3', value: 'hsl(28, 64%, 54%)' },
-    { name: 'dm-accent-4', value: 'hsl(36, 52%, 58%)' },
-  ],
-  borders: [
-    { name: 'dm-border', value: 'hsl(220, 10%, 30%)' },
-    { name: 'dm-divider', value: 'hsl(220, 10%, 24%)' },
-  ],
-  shadows: [
-    { name: 'dm-shadow', value: 'hsl(220, 10%, 5%)' },
-    { name: 'dm-shadow-strong', value: 'hsl(220, 10%, 3%)' },
-  ],
-  links: [
-    { name: 'dm-link', value: 'hsl(356, 80%, 62%)' },
-    { name: 'dm-link-hover', value: 'hsl(48, 100%, 60%)' },
-  ],
+// Función para leer valores desde CSS variables
+const getColorValue = (cssVar: string): string => {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(`--color-${cssVar}`)
+    .trim()
+  return value || ''
 }
+
+// Valores reactivos para los colores actuales
+const colorValues = ref<Record<string, string>>({})
+
+// Función para actualizar todos los valores
+const updateColorValues = () => {
+  const values: Record<string, string> = {}
+  Object.values(colorDefinitions).forEach(category => {
+    category.forEach(color => {
+      values[color.cssVar] = getColorValue(color.cssVar)
+    })
+  })
+  colorValues.value = values
+}
+
+// Actualizar cuando cambie el modo oscuro
+watch(isDarkMode, () => {
+  setTimeout(updateColorValues, 50)
+})
+
+// Actualizar al montar
+onMounted(() => {
+  updateColorValues()
+})
 
 const colorCategories = computed(() => {
-  const colors = isDarkMode.value ? darkColors : lightColors
   const themeLabel = isDarkMode.value ? 'Dark' : 'Light'
+  const prefix = isDarkMode.value ? 'dm' : 'lm'
   
-  return [
-    { name: `${themeLabel} Mode - Backgrounds`, colors: colors.backgrounds },
-    { name: `${themeLabel} Mode - Text`, colors: colors.text },
-    { name: `${themeLabel} Mode - Accents`, colors: colors.accents },
-    { name: `${themeLabel} Mode - Borders`, colors: colors.borders },
-    { name: `${themeLabel} Mode - Shadows`, colors: colors.shadows },
-    { name: `${themeLabel} Mode - Links`, colors: colors.links },
-  ]
+  return Object.entries(colorDefinitions).map(([category, colors]) => ({
+    name: `${themeLabel} Mode - ${category.charAt(0).toUpperCase() + category.slice(1)}`,
+    colors: colors.map(color => ({
+      name: `${prefix}-${color.name}`,
+      cssVar: color.cssVar,
+    })),
+  }))
 })
 
 const fonts = [
@@ -239,6 +281,8 @@ const fonts = [
 </script>
 
 <style lang="scss" scoped>
+@use "@styles/globals" as *;
+
 .color-card {
   height: 100%;
   display: flex;
@@ -249,7 +293,72 @@ const fonts = [
   width: 100%;
   height: 120px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border);
+
+  // Clases dinámicas para cada color usando CSS variables
+  &--background {
+    background-color: var(--color-background);
+  }
+
+  &--surface {
+    background-color: var(--color-surface);
+  }
+
+  &--surface-2 {
+    background-color: var(--color-surface-2);
+  }
+
+  &--text-primary {
+    background-color: var(--color-text-primary);
+  }
+
+  &--text-secondary {
+    background-color: var(--color-text-secondary);
+  }
+
+  &--text-muted {
+    background-color: var(--color-text-muted);
+  }
+
+  &--accent-1 {
+    background-color: var(--color-accent-1);
+  }
+
+  &--accent-2 {
+    background-color: var(--color-accent-2);
+  }
+
+  &--accent-3 {
+    background-color: var(--color-accent-3);
+  }
+
+  &--accent-4 {
+    background-color: var(--color-accent-4);
+  }
+
+  &--border {
+    background-color: var(--color-border);
+  }
+
+  &--divider {
+    background-color: var(--color-divider);
+  }
+
+  &--shadow {
+    background-color: var(--color-shadow);
+  }
+
+  &--shadow-strong {
+    background-color: var(--color-shadow-strong);
+  }
+
+  &--link {
+    background-color: var(--color-link);
+  }
+
+  &--link-hover {
+    background-color: var(--color-link-hover);
+  }
 }
 
 .color-info {

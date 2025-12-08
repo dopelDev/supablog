@@ -30,41 +30,49 @@ $lm-link: hsl(24, 9%, 38%); // #6C5D53 enlace
 $lm-link-hover: hsl(22, 7%, 21%); // #3E342F enlace hover
 
 /* ======================================================
-   DARK MODE (Tabloid Británico + Legible) — HSL
-   Basado en: The Sun, Daily Mirror, Daily Star, Express
+   DARK MODE (Tabloid Británico + Legible) — HSL (revisión)
+   Enfoque: Accents en grises + Texto “caliente” para énfasis
    ====================================================== */
 
 /* Fondo */
-$dm-background: hsl(220, 10%, 8%); // #121416 gris carbón oscuro
-$dm-surface: hsl(220, 8%, 14%); // #212327 superficie legible
-$dm-surface-2: hsl(220, 7%, 20%); // #2F3237 elevación suave
+$dm-background: hsl(220, 10%, 8%); // #121416
+$dm-surface: hsl(220, 8%, 14%); // #212327
+$dm-surface-2: hsl(220, 7%, 20%); // #2F3237
 
-/* Texto */
-$dm-text-primary: hsl(0, 0%, 96%); // #F5F5F5 blanco editorial
-$dm-text-secondary: hsl(0, 0%, 78%); // #C7C7C7
-$dm-text-muted: hsl(220, 10%, 65%); // #9DA3AF
+/* Texto base */
+$dm-text-primary: hsl(45, 60%, 72%); // #E5D19B crema editorial (texto base)
+$dm-text-secondary: hsl(
+  0,
+  62%,
+  60%
+); // #D45A5A rojo editorial (énfasis/etiquetas)
+$dm-text-muted: hsl(
+  20,
+  10%,
+  45%
+); // #6F655F oscuro cálido (subtítulos/metadata)
 
 /* Dividers & Borders */
 $dm-border: hsl(220, 10%, 30%); // #454A54
 $dm-divider: hsl(220, 10%, 24%); // #373B43
 
-/* DARK MODE — SOLO 4 ACCENTS (versión final) */
+/* ACCENTS — SOLO 4 (escala de grises, neutra) */
+$dm-accent-1: hsl(0, 0%, 78%); // #C7C7C7  (claro: hairlines, subtle highlights)
+$dm-accent-2: hsl(0, 0%, 62%); // #9E9E9E  (contrastes suaves, íconos inactivos)
+$dm-accent-3: hsl(0, 0%, 48%); // #7A7A7A  (controles, toggles, tabs)
+$dm-accent-4: hsl(
+  0,
+  0%,
+  36%
+); // #5C5C5C  (chips, badges neutros, hover de neutros)
 
-/* Accent 1 — Primario (fuerte, editorial, énfasis) */
-$dm-accent-1: hsl(356, 92%, 54%); // #EF4444
+/* Interactivos (opción A: link discreto + subrayado para accesibilidad) */
+$dm-link: hsl(0, 0%, 82%); // #D2D2D2
+$dm-link-hover: hsl(0, 0%, 92%); // #EBEBEB
 
-/* Accent 2 — Secundario (más cálido, intenso) */
-$dm-accent-2: hsl(19, 92%, 56%); // #F97316
-
-/* Accent 3 — Terciario (bronce editorial) */
-$dm-accent-3: hsl(28, 64%, 54%); // #D97706
-
-/* Accent 4 — Cuaternario (latón/pergamino cálido, como light mode pero adaptado a dark) */
-$dm-accent-4: hsl(36, 52%, 58%); // #F59E0B
-
-/* Interactivos */
-$dm-link: hsl(356, 80%, 62%); // #EC515B link tabloide
-$dm-link-hover: hsl(48, 100%, 60%); // #FFD633 hover estilo alerta
+/* Focus/Outline (accesibilidad con grises, alta visibilidad sobre surface) */
+$dm-focus-ring: hsl(0, 0%, 85%); // #D9D9D9
+$dm-focus-ring-soft: hsl(0, 0%, 70%); // #B3B3B3
 
 /* Depth */
 $dm-shadow: hsl(220, 10%, 5%); // #0B0C0E

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ClassifiedRibbon class="my-6" />
+    <ClassifiedsRibbon class="my-6" />
   </div>
 </template>
 
