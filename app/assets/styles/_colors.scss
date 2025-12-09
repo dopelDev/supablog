@@ -16,9 +16,10 @@ $lm-border: hsl(42, 11%, 75%); // #C8C3B8 borde suave
 $lm-divider: hsl(42, 16%, 82%); // #D7D2C8 divisor claro
 
 /* Accent Colors */
-$lm-accent-1: hsl(39, 30%, 62%); // #BFA980 acento primario
+
+$lm-accent-1: hsl(28, 20%, 45%); // #8A735B acento terciario
 $lm-accent-2: hsl(33, 23%, 54%); // #A68D6C acento secundario
-$lm-accent-3: hsl(28, 20%, 45%); // #8A735B acento terciario
+$lm-accent-3: hsl(39, 30%, 62%); // #BFA980 acento primario
 $lm-accent-4: hsl(39, 22%, 69%); // #C3B49C acento cuaternario
 
 /* Depth */
@@ -57,14 +58,14 @@ $dm-border: hsl(220, 10%, 30%); // #454A54
 $dm-divider: hsl(220, 10%, 24%); // #373B43
 
 /* ACCENTS — SOLO 4 (escala de grises, neutra) */
-$dm-accent-1: hsl(0, 0%, 78%); // #C7C7C7  (claro: hairlines, subtle highlights)
-$dm-accent-2: hsl(0, 0%, 62%); // #9E9E9E  (contrastes suaves, íconos inactivos)
-$dm-accent-3: hsl(0, 0%, 48%); // #7A7A7A  (controles, toggles, tabs)
-$dm-accent-4: hsl(
+$dm-accent-1: hsl(
   0,
   0%,
   36%
-); // #5C5C5C  (chips, badges neutros, hover de neutros)
+); // #5C5C5C (chips, badges neutros, hover de neutros)
+$dm-accent-2: hsl(0, 0%, 48%); // #7A7A7A (controles, toggles, tabs)
+$dm-accent-3: hsl(0, 0%, 62%); // #9E9E9E (contrastes suaves, íconos inactivos)
+$dm-accent-4: hsl(0, 0%, 78%); // #C7C7C7 (claro: hairlines, subtle highlights)
 
 /* Interactivos (opción A: link discreto + subrayado para accesibilidad) */
 $dm-link: hsl(0, 0%, 82%); // #D2D2D2
