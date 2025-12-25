@@ -105,6 +105,7 @@ Mode declaration (MUST be present; set exactly one to `enabled`):
 
 Workflows are **optional, on-demand tasks**.
 They never run automatically.
+Workflow execution is mode-agnostic; when explicitly requested and confirmed, the workflow's own scope and limitations apply regardless of the enabled Agent Mode.
 
 Before executing ANY Workflow, the agent MUST:
 

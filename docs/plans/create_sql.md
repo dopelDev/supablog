@@ -4,24 +4,23 @@
 
 **Objetivo:** definir un esquema mínimo para un blog en Supabase con Auth (OAuth), posts (draft/published), comentarios, y archivos en Storage con control por RLS.
 
-## Asunciones (para no “asumir intent” sin decirlo)
+## Decisiones cerradas (v3)
 
 - Multi-author: cada usuario autenticado puede crear posts.
-- Público: lectura de posts `published` por `anon`; drafts solo dueño.
-- Comentarios: requieren login (no `anon`) y se leen solo si el post es “legible”.
-- Archivos: bucket privado por defecto + policies para lectura controlada (o alternativa: signed URLs).
-
-## Preguntas abiertas (deciden el SQL final)
-
-- ¿Solo existe un Admin (single-author) o cualquiera puede publicar (multi-author)?
-- ¿Quieres moderación/soft-delete para comentarios?
-- ¿Los archivos deben ser públicos por policy o siempre por signed URL?
+- Público: lectura de posts `published` por `anon`; drafts/archived solo dueño.
+- Comentarios: requieren login para crear; se crean solo en posts `published`; por defecto `is_hidden = true`.
+- Moderación: solo el autor del post puede mostrar/ocultar/borrar comentarios.
+- Archivos: bucket privado `blog-files` con policies de lectura pública para posts publicados y avatars.
+- Status y cambios sensibles: `publish/archive/unpublish` solo via RPC; updates directos bloqueados.
+- Avatar y files: updates directos bloqueados; cambios solo via RPC.
+- Signed URLs: no se usan (policies públicas en posts publicados + avatars).
 
 ## Checklist rápido
 
 - Auth OAuth2 (Google + Microsoft)
 - Tablas: `public.profiles`, `public.posts`, `public.comments`, `public.files`
 - `posts.summary` para tarjetas
+- Moderación de comentarios (hidden por defecto)
 - RLS (Row Level Security) para evitar exposición accidental
 
 ---
@@ -144,12 +143,15 @@ create table public.comments (
   user_id uuid not null references public.profiles (id) on delete cascade,
 
   comment_text text not null,
+  is_hidden boolean not null default true,
+  moderated_by uuid references public.profiles (id) on delete set null,
+  moderated_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 ```
 
-Si no planeas editar comentarios, puedes omitir `updated_at` para reducir superficie.
+No se permite editar `comment_text`; `updated_at` se usa para moderación. Si no quieres auditoría, elimina `moderated_by`/`moderated_at`.
 
 ### 4.5 Files (metadata + referencia a storage)
 
@@ -162,7 +164,7 @@ create table public.files (
   post_id bigint references public.posts (id) on delete set null,
 
   bucket text not null default 'blog-files',
-  object_path text not null,          -- ruta dentro del bucket (ej: userId/postId/uuid.png)
+  object_path text not null,          -- ruta dentro del bucket (ej: uid/posts/postId/uuid-filename)
   file_name text not null,
   mime_type text,
   size_bytes bigint,
@@ -184,6 +186,11 @@ create index idx_posts_user_updated_desc
 on public.posts (user_id, updated_at desc, id desc);
 
 -- COMMENTS: hilo de un post
+create index idx_comments_post_visible_desc
+on public.comments (post_id, created_at desc, id desc)
+where is_hidden = false;
+
+-- COMMENTS: moderación (cargar todos para el autor)
 create index idx_comments_post_created_desc
 on public.comments (post_id, created_at desc, id desc);
 
@@ -292,7 +299,7 @@ for each row execute procedure public.set_owner_id();
 
 > Si prefieres “forzar” siempre el dueño, cambia el bloque por `new.user_id := auth.uid();`.
 
-Opcional: setear `published_at` cuando pasa a published:
+Recomendado: setear `published_at` cuando pasa a published:
 
 ```sql
 create or replace function public.set_published_at()
@@ -316,7 +323,7 @@ before update on public.posts
 for each row execute procedure public.set_published_at();
 ```
 
-Opcional (modo pro): bloquear cambios de `status` salvo vía RPC:
+Requerido: bloquear cambios de `status` salvo vía RPC:
 
 ```sql
 create or replace function public.block_status_change()
@@ -442,7 +449,7 @@ end;
 $$;
 ```
 
-RPC `unpublish_post` (volver a draft) — opcional:
+RPC `unpublish_post` (volver a draft):
 
 ```sql
 create or replace function public.unpublish_post(p_post_id bigint)
@@ -469,12 +476,12 @@ $$;
 
 ## 6.x RPCs para Files (attachments + avatar)
 
-Si vas a tratar `files.post_id` y `profiles.avatar_url` como **acciones** (no “updates libres”), la idea es:
+En v3, `files.post_id` y `profiles.avatar_url` se tratan como **acciones** (no “updates libres”):
 
 - dar `update` en `files` pero **bloquearlo por trigger**, y
 - permitir cambios solo desde RPCs (usando flags tipo `app.allow_*`).
 
-Opcional (modo pro): bloquear updates en `files` salvo vía RPC (solo permite cambiar `post_id`):
+Requerido: bloquear updates en `files` salvo vía RPC (solo permite cambiar `post_id`):
 
 ```sql
 create or replace function public.block_files_update()
@@ -597,7 +604,7 @@ end;
 $$;
 ```
 
-Opcional (modo pro): bloquear cambios de `profiles.avatar_url` salvo vía RPC:
+Requerido: bloquear cambios de `profiles.avatar_url` salvo vía RPC:
 
 ```sql
 create or replace function public.block_avatar_url_change()
@@ -664,6 +671,82 @@ end;
 $$;
 ```
 
+## 6.x Comentarios: moderación via RPC
+
+Bloquear updates directos en `comments` y permitir solo cambios de visibilidad vía RPC:
+
+```sql
+create or replace function public.block_comment_update()
+returns trigger
+language plpgsql
+as $$
+begin
+  if coalesce(current_setting('app.allow_comment_moderation', true), '') <> 'on' then
+    raise exception using
+      errcode = 'P0001',
+      message = 'comment update not allowed';
+  end if;
+
+  -- solo permitir cambiar visibilidad y campos de moderación
+  if new.comment_text <> old.comment_text
+    or new.user_id <> old.user_id
+    or new.post_id <> old.post_id
+    or new.created_at <> old.created_at then
+    raise exception using
+      errcode = 'P0001',
+      message = 'only visibility fields can be updated';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_block_comment_update on public.comments;
+create trigger trg_block_comment_update
+before update on public.comments
+for each row execute procedure public.block_comment_update();
+```
+
+RPC para mostrar/ocultar comentarios (solo autor del post):
+
+```sql
+create or replace function public.set_comment_visibility(p_comment_id bigint, p_is_hidden boolean)
+returns void
+language plpgsql
+security invoker
+as $$
+begin
+  if not exists (
+    select 1
+    from public.comments c
+    join public.posts p on p.id = c.post_id
+    where c.id = p_comment_id
+      and p.user_id = auth.uid()
+  ) then
+    raise exception using
+      errcode = 'P0001',
+      message = 'cannot moderate: comment not found or not allowed';
+  end if;
+
+  perform set_config('app.allow_comment_moderation', 'on', true);
+
+  update public.comments
+  set is_hidden = p_is_hidden,
+      moderated_by = auth.uid(),
+      moderated_at = now()
+  where id = p_comment_id;
+
+  if not found then
+    raise exception using
+      errcode = 'P0001',
+      message = 'cannot moderate: comment not found';
+  end if;
+end;
+$$;
+```
+
+> Nota: si eliminaste `moderated_by`/`moderated_at`, ajusta el `update` dentro del RPC.
+
 RPC para limpiar tu avatar (deja `avatar_url = null`):
 
 ```sql
@@ -711,7 +794,7 @@ grant insert, update, delete on public.posts to authenticated;
 grant usage, select on sequence public.posts_id_seq to authenticated;
 
 grant select on public.comments to anon, authenticated;
-grant insert, delete on public.comments to authenticated;
+grant insert, update, delete on public.comments to authenticated;
 grant usage, select on sequence public.comments_id_seq to authenticated;
 
 grant select on public.files to anon, authenticated;
@@ -749,6 +832,8 @@ on public.profiles for update
 using (id = auth.uid())
 with check (id = auth.uid());
 ```
+
+> Nota: `avatar_url` se cambia solo via RPC; el trigger bloquea updates directos.
 
 ### 7.3 Posts policies (draft privado, published público)
 
@@ -789,6 +874,8 @@ on public.posts for delete
 using (user_id = auth.uid());
 ```
 
+> Nota: cambios de `status` se bloquean por trigger; usa RPCs `publish/archive/unpublish`.
+
 ### 7.4 Helpers para reglas repetidas
 
 ```sql
@@ -807,27 +894,81 @@ $$;
 
 ### 7.5 Comments policies
 
-**Leer comentarios solo de posts permitidos** (publicados o tuyos)
+**Leer comentarios visibles en posts publicados** (público)
 
 ```sql
-create policy "comments: read allowed posts"
+create policy "comments: read visible on published"
 on public.comments for select
-using (public.can_read_post(comments.post_id));
+using (
+  is_hidden = false
+  and exists (
+    select 1
+    from public.posts p
+    where p.id = comments.post_id
+      and p.status = 'published'
+  )
+);
 ```
 
-**Crear comentario: solo si el post es published** (o si eres dueño del post)
+**Leer todos los comentarios de tus posts** (autor del post)
 
 ```sql
-create policy "comments: insert on allowed posts"
+create policy "comments: read own post"
+on public.comments for select
+using (
+  exists (
+    select 1
+    from public.posts p
+    where p.id = comments.post_id
+      and p.user_id = auth.uid()
+  )
+);
+```
+
+**Crear comentario: solo si el post es published**
+
+```sql
+create policy "comments: insert on published"
 on public.comments for insert
 with check (
   user_id = auth.uid()
-  and public.can_read_post(comments.post_id)
+  and exists (
+    select 1
+    from public.posts p
+    where p.id = comments.post_id
+      and p.status = 'published'
+  )
 );
 
-create policy "comments: delete own"
+create policy "comments: update by post author"
+on public.comments for update
+using (
+  exists (
+    select 1
+    from public.posts p
+    where p.id = comments.post_id
+      and p.user_id = auth.uid()
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.posts p
+    where p.id = comments.post_id
+      and p.user_id = auth.uid()
+  )
+);
+
+create policy "comments: delete by post author"
 on public.comments for delete
-using (user_id = auth.uid());
+using (
+  exists (
+    select 1
+    from public.posts p
+    where p.id = comments.post_id
+      and p.user_id = auth.uid()
+  )
+);
 ```
 
 ### 7.6 Files policies
@@ -875,6 +1016,8 @@ on public.files for delete
 using (user_id = auth.uid());
 ```
 
+> Nota: updates directos en `files` se bloquean por trigger; usa RPCs para adjuntar/desadjuntar.
+
 ---
 
 ## 8) Storage policies (para el bucket `blog-files`)
@@ -883,8 +1026,11 @@ Esto se hace en SQL también, pero ojo: Storage usa tablas internas como `storag
 
 ### 8.1 Permitir subir a tu propia carpeta
 
-Estrategia simple: guardar objetos con path tipo:
-`{userId}/{postId?}/{uuid}-{filename}`
+Estrategia: usar convenciones fijas de path:
+
+- `blog-files/{uid}/posts/{postId}/{uuid}-{filename}`
+- `blog-files/{uid}/avatar/{uuid}-{filename}`
+- `blog-files/{uid}/misc/{uuid}-{filename}`
 
 **Insert (upload) solo si el primer folder = tu uid:**
 
@@ -946,7 +1092,7 @@ using (
 );
 ```
 
-> Nota: Si prefieres mayor control, puedes generar **signed URLs** desde el backend o desde el cliente según tus reglas, en vez de permitir acceso directo a través de esta política.
+> Nota: en v3 se mantienen policies públicas para posts publicados y avatars (no signed URLs).
 
 ---
 
@@ -974,12 +1120,12 @@ En este repo, Supabase corre vía `docker compose up -d` y expone:
 
 - Publicar = llamar `rpc/publish_post`
 - Archivar = llamar `rpc/archive_post`
-- (Opcional) Despublicar = `rpc/unpublish_post` (volver a draft)
-- Trigger opcional setea `published_at`
+- Despublicar = `rpc/unpublish_post` (volver a draft)
+- Trigger recomendado setea `published_at`
 
 ### 9.4 Subir archivo
 
-1. Subes a Storage: `blog-files/{uid}/{postId}/{uuid-filename}`
+1. Subes a Storage: `blog-files/{uid}/posts/{postId}/{uuid-filename}`
 2. Insert en `files` con:
    - `user_id=auth.uid()`
    - `post_id` (si aplica)
@@ -1000,7 +1146,11 @@ Avatar (si usas Storage para el avatar):
 
 ### 9.5 Comentarios
 
-- Insert solo si el post está publicado (o eres dueño)
+- Insert solo si el post está publicado
+- Comentarios quedan `hidden` por defecto
+- El autor del post usa RPC `set_comment_visibility` para mostrar/ocultar
+- Solo el autor del post puede borrar comentarios
+- Lectores (anon/auth) solo ven comentarios visibles
 
 ---
 
@@ -1048,6 +1198,7 @@ where id = 'uuid-del-autor';
 - `public_profiles` para exponer solo campos públicos
 - `files.object_path` validado contra `auth.uid()`
 - RPCs para transiciones de status (publish/archive/unpublish) + trigger que bloquea cambios directos
+- RPCs para moderar comentarios + trigger que bloquea updates directos
 - Helper `public.can_read_post()` para no duplicar reglas
 
 ---
