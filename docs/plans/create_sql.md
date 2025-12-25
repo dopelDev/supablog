@@ -23,6 +23,44 @@
 - Moderación de comentarios (hidden por defecto)
 - RLS (Row Level Security) para evitar exposición accidental
 
+## Orden recomendado v3 (step-by-step)
+
+Este es el orden sugerido para ejecutar los planes v3 y los pasos manuales:
+
+1) **Setup manual (antes de SQL): OAuth2**
+   - Configurar Google y Microsoft en Supabase Dashboard.
+   - Definir redirect URLs en cada provider.
+   - Resultado: el login funciona y crea filas en `auth.users`.
+   - Referencia: sección 2) “Activar OAuth” en este documento.
+
+2) **Crear bucket (manual, una vez)**
+   - Crear `blog-files` en Storage con `public = false`.
+   - Referencia: `docs/plans/buckets.v3.md`.
+
+3) **Aplicar migrations SQL (automatizado)**
+   - Ejecutar `db/migrations/001_types.sql` → `007_views_policies.sql`.
+   - Incluye esquema, triggers, RPCs, RLS y policies.
+   - Referencia: `docs/plans/DB_RLS_RPC_tringgers.v3.md`.
+
+4) **Storage policies (automatizado)**
+   - Ejecutar `db/migrations/008_storage_policies.sql`.
+   - Policies para lectura pública de posts publicados y avatars.
+   - Referencia: `docs/plans/buckets.v3.md`.
+
+5) **Seed data (automatizado)**
+   - Crear admin user (author1) via Admin API desde `.env`.
+   - Insertar posts, comments y files reales.
+   - Referencia: `docs/plans/seed_data.v3.md`.
+
+6) **Verificación**
+   - Validar RLS, visibilidad de comentarios y acceso a Storage.
+   - Verificar flujos en la app con `anon` y `authenticated`.
+   - Referencias: `docs/plans/DB_RLS_RPC_tringgers.v3.md` + `docs/plans/seed_data.v3.md`.
+
+Notas:
+- Si cambias OAuth, puedes ejecutar los pasos 3–6 sin repetir el setup del provider.
+- Si reinicias la base local, repite 3–6 (y el bucket si eliminaste Storage).
+
 ---
 
 ## 0) Antes de tocar SQL: qué hace Supabase por ti

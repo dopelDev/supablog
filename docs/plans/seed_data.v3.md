@@ -13,61 +13,119 @@ Este documento es autonomo y puede ser ejecutado por un agente distinto a los ot
 - Esquema + RLS + policies implementados (ver `DB_RLS_RPC_tringgers.v3.md`).
 - Bucket y policies de Storage implementados (ver `buckets.v3.md`).
 - Supabase local corriendo.
+- Variables en `.env` para el admin user (ver Paso 1).
 
 ## Decisiones cerradas
 
 1) Crear usuarios de seed:
 - Opcion C: Admin API (service role key, solo dev).
+- Admin user = author1 (se usa para seed).
+- `email_confirm = false`.
+- `ADMIN_DISPLAY_NAME` se usa como `user_metadata.full_name`.
+- Author2 es opcional (solo si quieres pruebas multi-author).
 
 2) Archivos de seed:
 - Se suben archivos reales a Storage + metadata en `public.files`.
 
 ## Paso a paso — Implementacion
 
-### Paso 1 — Crear usuarios de seed (Admin API)
+### Paso 1 — Configurar variables en `.env` (admin user)
 
-Usuarios sugeridos:
-- `author1@example.com`
-- `author2@example.com`
-
-Accion:
-- Crear usuarios via Admin API con `SUPABASE_SERVICE_ROLE_KEY`.
-- Confirmar que existen en `auth.users`.
-- Verificar que `public.profiles` se creo via trigger.
+Variables requeridas:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `ADMIN_DISPLAY_NAME`
 
 Checklist:
-- [ ] Usuarios existen en `auth.users`
-- [ ] `public.profiles` creado
+- [ ] Variables definidas en `.env`
 
-### Paso 2 — Validar IDs
+### Paso 2 — Script automatizado: crear admin user (author1)
 
-- Consultar `auth.users` para obtener `id` por email.
+Script sugerido (idempotente, usa Admin API):
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${SUPABASE_URL:?}"
+: "${SUPABASE_SERVICE_ROLE_KEY:?}"
+: "${ADMIN_EMAIL:?}"
+: "${ADMIN_PASSWORD:?}"
+: "${ADMIN_DISPLAY_NAME:?}"
+
+payload=$(cat <<JSON
+{"email":"$ADMIN_EMAIL","password":"$ADMIN_PASSWORD","email_confirm":false,"user_metadata":{"full_name":"$ADMIN_DISPLAY_NAME"}}
+JSON
+)
+
+status=$(curl -sS -o /tmp/admin_user_resp -w "%{http_code}" \
+  -X POST "$SUPABASE_URL/auth/v1/admin/users" \
+  -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+  -H "Content-Type: application/json" \
+  -d "$payload")
+
+if [ "$status" = "200" ] || [ "$status" = "201" ]; then
+  echo "Admin user creado"
+elif [ "$status" = "422" ] || [ "$status" = "409" ]; then
+  echo "Admin user ya existe"
+else
+  echo "Fallo al crear admin user (HTTP $status)" >&2
+  cat /tmp/admin_user_resp >&2
+  exit 1
+fi
+```
+
+Integracion con creacion del container:
+- Ejecutar el script como servicio one-shot en `docker-compose.yml` luego de levantar Supabase.
+- Alternativa: correr el script despues de `docker compose up -d` en tu workflow local.
+
+Checklist:
+- [ ] Admin user creado (o ya existia) en `auth.users`
+- [ ] `public.profiles` creado via trigger
+
+### Paso 3 — Crear author2 (opcional)
+
+Si necesitas pruebas multi-author:
+- Repite el script con otro email/password/display_name.
+- O crea el segundo usuario desde Studio.
+
+Checklist:
+- [ ] Author2 creado (si aplica)
+
+### Paso 4 — Validar IDs
+
+- Consultar `auth.users` para obtener `id` por email (usa `ADMIN_EMAIL`).
 - Si faltan perfiles, hacer upsert en `public.profiles`.
 
 Checklist:
 - [ ] IDs listos
 - [ ] Perfiles existentes
 
-### Paso 3 — Insertar posts de ejemplo
+### Paso 5 — Insertar posts de ejemplo
 
 Archivo sugerido: `db/seed/001_seed_app.sql`
 
-- Insertar 1 post `draft` y al menos 1 post `published`.
+- Insertar 1 post `draft` y al menos 1 post `published` para el admin user (author1).
+- (Opcional) Un post publicado de author2 si existe.
 - `published` debe setearse via RPC (no via update directo).
 
 Checklist:
 - [ ] Existe al menos 1 post `published`
 - [ ] Existe al menos 1 post `draft`
 
-### Paso 4 — Insertar comentarios de ejemplo (hidden por defecto)
+### Paso 6 — Insertar comentarios de ejemplo (hidden por defecto)
 
 - Insertar comentarios con `is_hidden = true` (default).
 - Asignar comentarios a posts publicados.
+- (Opcional) Usar author2 para comentar posts del admin.
 
 Checklist:
 - [ ] Comentario existe y esta oculto por defecto
 
-### Paso 5 — Moderar comentarios via RPC
+### Paso 7 — Moderar comentarios via RPC
 
 - Usar RPC `set_comment_visibility` para mostrar un comentario.
 - Verificar que solo el autor del post puede moderar.
@@ -76,18 +134,18 @@ Checklist:
 - [ ] Comentario visible solo tras moderacion
 - [ ] Usuario no autor no puede moderar
 
-### Paso 6 — Subir archivos reales a Storage
+### Paso 8 — Subir archivos reales a Storage
 
 - Subir archivos al bucket `blog-files` usando rutas con `{uid}/...`.
 - Subir al menos:
-  - avatar para `author1`
-  - imagen para un post publicado de `author1`
+  - avatar para admin user (author1)
+  - imagen para un post publicado del admin user
 
 Checklist:
 - [ ] Objetos existen en Storage
 - [ ] Rutas cumplen convencion
 
-### Paso 7 — Registrar metadata en `public.files`
+### Paso 9 — Registrar metadata en `public.files`
 
 - Insertar filas en `public.files` con `object_path` exacto.
 - Asociar avatar y file al post correspondiente.
@@ -97,10 +155,10 @@ Checklist:
 - [ ] `object_path` coincide con Storage
 - [ ] `post_id` correcto en files del post
 
-### Paso 8 — Verificacion con la app
+### Paso 10 — Verificacion con la app
 
-- Author1 ve su draft y lo edita.
-- Author2 no puede editar posts de Author1.
+- Admin user (author1) ve su draft y lo edita.
+- Author2 no puede editar posts del admin (si existe).
 - Visitante (anon) ve posts publicados y comentarios visibles.
 - Visitante puede ver archivos de posts publicados y avatar publico.
 
